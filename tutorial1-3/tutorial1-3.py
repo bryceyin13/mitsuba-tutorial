@@ -15,7 +15,7 @@ def scalar_rgb_example():
 
     img = mi.render(scene, spp=1024)
     bitmap = mi.Bitmap(img)
-    bitmap.write('output.exr')
+    bitmap.write('outputs/output.exr')
 
     # cam2 = mi.load_dict({
     #     'type': 'perspective',
@@ -33,7 +33,7 @@ def scalar_rgb_example():
 
     # img2 = mi.render(scene, sensor=cam2, spp=64)
     # bitmap2 = mi.Bitmap(img2)
-    # bitmap2.write('output2.exr')
+    # bitmap2.write('outputs/output2.exr')
 
 def llvm_ad_rgb_example():
     mi.set_variant('llvm_ad_rgb')
@@ -42,7 +42,7 @@ def llvm_ad_rgb_example():
     # image_ref_data = np.array(image_ref)
     # bitmap_ref = mi.Bitmap(image_ref_data)
     # # bitmap_ref = mi.util.convert_to_bitmap(image_data)
-    # bitmap_ref.write('output_ref.exr')
+    # bitmap_ref.write('outputs/output_ref.exr')
 
     scene_params = mi.traverse(scene)
     # print(scene_params) 
@@ -52,9 +52,9 @@ def llvm_ad_rgb_example():
     scene_params.update()
 
     image = mi.render(scene, spp=1024)
-    image_data = np.array(image)
-    bitmap = mi.Bitmap(image_data)
-    bitmap.write('output_mod.exr')
+    # image_data = np.array(image)
+    bitmap = mi.Bitmap(image)
+    bitmap.write('outputs/output_mod.exr')
 
 def gradient_based_optimize_scene():
     mi.set_variant('cuda_ad_rgb')
@@ -97,7 +97,7 @@ def gradient_based_optimize_scene():
 
     for i, img in enumerate(images):
         bitmap = mi.Bitmap(img)
-        bitmap.write(f'opt/optimize_{i:02d}.exr')
+        bitmap.write(f'outputs/opt/optimize_{i:02d}.exr')
 
     print('\nOptimization complete!')
 
@@ -114,16 +114,24 @@ def caustic_design():
         'learning_rate': 3e-5,
         'reference': 'scenes/caustic-design/target.exr',
     }
-    output_dir = realpath(join('outputs', 'sunday'))
+    output_dir = realpath(join('outputs', 'caustic-design'))
     os.makedirs(output_dir, exist_ok=True)
+
+    image_ref = mi.TensorXf(mi.Bitmap(config['reference']))
+    print('reference image loaded: ', config['reference'])
+    bm = mi.Bitmap(image_ref)
+    bm.write(join(output_dir, 'reference.exr'))
+
+
+
 
 if __name__ == '__main__':
     # Tutorial 2
-    scalar_rgb_example()
+    # scalar_rgb_example()
 
     # Tutorial 3
     # llvm_ad_rgb_example()
     # gradient_based_optimize_scene()
 
     # Tutorial 4
-    # caustic_design()
+    caustic_design()
